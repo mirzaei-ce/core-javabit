@@ -1,0 +1,22 @@
+[Unit]
+Description=Javabit's distributed currency daemon
+After=network.target
+
+[Service]
+User=javabit
+Group=javabit
+
+Type=forking
+PIDFile=/var/lib/javabitd/javabitd.pid
+ExecStart=/usr/bin/javabitd -daemon -pid=/var/lib/javabitd/javabitd.pid \
+-conf=/etc/javabit/javabit.conf -datadir=/var/lib/javabitd -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

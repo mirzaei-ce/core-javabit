@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Javabit
+Comment=Javabit P2P Cryptocurrency
+Comment[fr]=Javabit, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Javabit, eşten eşe kriptografik sanal para birimi
+Exec=javabit-qt %u
+Terminal=false
+Type=Application
+Icon=javabit128
+MimeType=x-scheme-handler/javabit;
+Categories=Office;Finance;

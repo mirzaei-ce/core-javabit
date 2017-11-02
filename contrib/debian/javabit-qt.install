@@ -1,0 +1,6 @@
+usr/local/bin/javabit-qt usr/bin
+share/pixmaps/javabit32.xpm usr/share/pixmaps
+share/pixmaps/javabit16.xpm usr/share/pixmaps
+share/pixmaps/javabit128.png usr/share/pixmaps
+debian/javabit-qt.desktop usr/share/applications
+debian/javabit-qt.protocol usr/share/kde4/services/

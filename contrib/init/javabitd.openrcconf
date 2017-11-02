@@ -1,0 +1,33 @@
+# /etc/conf.d/javabitd: config file for /etc/init.d/javabitd
+
+# Config file location
+#JAVABITD_CONFIGFILE="/etc/javabit/javabit.conf"
+
+# What directory to write pidfile to?  (created and owned by $JAVABITD_USER)
+#JAVABITD_PIDDIR="/var/run/javabitd"
+
+# What filename to give the pidfile
+#JAVABITD_PIDFILE="${JAVABITD_PIDDIR}/javabitd.pid"
+
+# Where to write javabitd data (be mindful that the blockchain is large)
+#JAVABITD_DATADIR="/var/lib/javabitd"
+
+# User and group to own javabitd process
+#JAVABITD_USER="javabit"
+#JAVABITD_GROUP="javabit"
+
+# Path to javabitd executable
+#JAVABITD_BIN="/usr/bin/javabitd"
+
+# Nice value to run javabitd under
+#JAVABITD_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+JAVABITD_OPTS="-disablewallet"
+
+# The timeout in seconds OpenRC will wait for javabitd to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+JAVABITD_SIGTERM_TIMEOUT=60

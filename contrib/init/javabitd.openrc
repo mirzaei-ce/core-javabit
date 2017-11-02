@@ -1,0 +1,92 @@
+#!/sbin/runscript
+
+# backward compatibility for existing gentoo layout 
+#
+if [ -d "/var/lib/javabit/.javabit" ]; then
+	JAVABITD_DEFAULT_DATADIR="/var/lib/javabit/.javabit"
+else
+	JAVABITD_DEFAULT_DATADIR="/var/lib/javabitd"
+fi
+
+JAVABITD_CONFIGFILE=${JAVABITD_CONFIGFILE:-/etc/javabit/javabit.conf}
+JAVABITD_PIDDIR=${JAVABITD_PIDDIR:-/var/run/javabitd}
+JAVABITD_PIDFILE=${JAVABITD_PIDFILE:-${JAVABITD_PIDDIR}/javabitd.pid}
+JAVABITD_DATADIR=${JAVABITD_DATADIR:-${JAVABITD_DEFAULT_DATADIR}}
+JAVABITD_USER=${JAVABITD_USER:-${JAVABIT_USER:-javabit}}
+JAVABITD_GROUP=${JAVABITD_GROUP:-javabit}
+JAVABITD_BIN=${JAVABITD_BIN:-/usr/bin/javabitd}
+JAVABITD_NICE=${JAVABITD_NICE:-${NICELEVEL:-0}}
+JAVABITD_OPTS="${JAVABITD_OPTS:-${JAVABIT_OPTS}}"
+
+name="Javabit Core Daemon"
+description="Javabit cryptocurrency P2P network daemon"
+
+command="/usr/bin/javabitd"
+command_args="-pid=\"${JAVABITD_PIDFILE}\" \
+		-conf=\"${JAVABITD_CONFIGFILE}\" \
+		-datadir=\"${JAVABITD_DATADIR}\" \
+		-daemon \
+		${JAVABITD_OPTS}"
+
+required_files="${JAVABITD_CONFIGFILE}"
+start_stop_daemon_args="-u ${JAVABITD_USER} \
+			-N ${JAVABITD_NICE} -w 2000"
+pidfile="${JAVABITD_PIDFILE}"
+
+# The retry schedule to use when stopping the daemon. Could be either
+# a timeout in seconds or multiple signal/timeout pairs (like
+# "SIGKILL/180 SIGTERM/300")
+retry="${JAVABITD_SIGTERM_TIMEOUT}"
+
+depend() {
+	need localmount net
+}
+
+# verify
+# 1) that the datadir exists and is writable (or create it)
+# 2) that a directory for the pid exists and is writable
+# 3) ownership and permissions on the config file
+start_pre() {
+	checkpath \
+	-d \
+	--mode 0750 \
+	--owner "${JAVABITD_USER}:${JAVABITD_GROUP}" \
+	"${JAVABITD_DATADIR}"
+
+	checkpath \
+	-d \
+	--mode 0755 \
+	--owner "${JAVABITD_USER}:${JAVABITD_GROUP}" \
+	"${JAVABITD_PIDDIR}"
+
+	checkpath -f \
+	-o ${JAVABITD_USER}:${JAVABITD_GROUP} \
+	-m 0660 \
+	${JAVABITD_CONFIGFILE}
+
+	checkconfig || return 1
+}
+
+checkconfig()
+{
+	if ! grep -qs '^rpcpassword=' "${JAVABITD_CONFIGFILE}" ; then
+		eerror ""
+		eerror "ERROR: You must set a secure rpcpassword to run javabitd."
+		eerror "The setting must appear in ${JAVABITD_CONFIGFILE}"
+		eerror ""
+		eerror "This password is security critical to securing wallets "
+		eerror "and must not be the same as the rpcuser setting."
+		eerror "You can generate a suitable random password using the following"
+		eerror "command from the shell:"
+		eerror ""
+		eerror "bash -c 'tr -dc a-zA-Z0-9 < /dev/urandom | head -c32 && echo'"
+		eerror ""
+		eerror "It is also recommended that you also set alertnotify so you are "
+		eerror "notified of problems:"
+		eerror ""
+		eerror "ie: alertnotify=echo %%s | mail -s \"Javabit Alert\"" \
+			"admin@foo.com"
+		eerror ""
+		return 1
+	fi
+}
